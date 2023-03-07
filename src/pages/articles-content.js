@@ -51,7 +51,7 @@ const articles = [
         ]
     },     {
         id: '3',
-        name: 'my-thoughts-on-resumes',
+        name: 'learn-resume',
         title: 'My Thoughts on Resumes',
         content: [
             `Today is the day I talk about something which scares most people: resumes.
@@ -78,7 +78,7 @@ const articles = [
     
     {
         id: '4',
-        name: 'MongoDB Server',
+        name: 'mongoDb',
         title: 'MongoDB Database Server',
         content: [
             `Today is the day I talk about something which scares most people: resumes.

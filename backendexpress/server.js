@@ -29,11 +29,14 @@ app.put('/api/articles/:name/upvote', async(req, res) =>{
 
     // const article = articlesInfor.find(a => a.name ===name)
 
-    await db.collection('articles').updateOne({name}, {$inc:{upvotes:1},})
+    await db.collection('articles').updateOne({name}, {$inc:{upvotes: 1 },})
+
     const article = await db.collection('articles').findOne({name})
+    
     if(article){
+        res.json(article)
         // article.upvotes += 1
-        res.send(`The ${name} article now has ${article.upvotes} upvotes!! `)
+        // res.send(`The ${name} article now has ${article.upvotes} upvotes!! `)
     }else {
         res.send("doesn't exist ")
     }
@@ -79,13 +82,24 @@ ConnectDb (() =>{
 //    },
 
 // {
-//     name: 'learn-node',
+//     name: 'learn-mongodb',
 //     upvotes: 0,
 //     comments: [],
 // },
 
 // {
+//     name: 'learn-node',
+//     upvotes: 0,
+//     comments: [],
+// },
+// {
 //     name: 'mongoDb',
+//     upvotes: 0,
+//     comments: [],
+// },
+
+// {
+//    name: 'learn-resume',
 //     upvotes: 0,
 //     comments: [],
 // }]

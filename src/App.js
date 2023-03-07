@@ -1,7 +1,7 @@
 import './App.css';
 import HomePage from './pages/HomePage'
 import AboutPage from './pages/AboutPage'
-import ArticlesPage from './pages/ArticlesPage'
+import ArticlePage from './pages/ArticlePage'
 import NotFoundPage from './pages/NotFoundPage'
 import ArticlesListPage from './pages/ArticlesListPage'
 import NavBar from './NavBar';
@@ -16,7 +16,7 @@ function App() {
       <div id='page-body'> 
       <Routes> 
         <Route path='/' element={<HomePage/>} />
-        <Route path='/articles/:articleId' element={<ArticlesPage/>} />
+        <Route path='/articles/:articleId' element={<ArticlePage/>} />
         <Route path='/about' element={<AboutPage/>} />
         <Route path='/articles' element={<ArticlesListPage/>} />
         <Route path='*' element={<NotFoundPage/>} />
