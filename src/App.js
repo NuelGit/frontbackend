@@ -6,6 +6,8 @@ import NotFoundPage from './pages/NotFoundPage'
 import ArticlesListPage from './pages/ArticlesListPage'
 import NavBar from './NavBar';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import LoginPage from './pages/LoginPage';
+import CreateAccountPage from './pages/CreateAccountPage';
 
 
 function App() {
@@ -19,6 +21,8 @@ function App() {
         <Route path='/articles/:articleId' element={<ArticlePage/>} />
         <Route path='/about' element={<AboutPage/>} />
         <Route path='/articles' element={<ArticlesListPage/>} />
+        <Route path='/login' element ={<LoginPage />} />
+        <Route path='/create-account' element={<CreateAccountPage />} />
         <Route path='*' element={<NotFoundPage/>} />
       </Routes>
     </div>

@@ -4,6 +4,9 @@
 /node_modules
 /.pnp
 .pnp.js
+credential.json
+node_modules
+
 
 # testing
 /coverage
