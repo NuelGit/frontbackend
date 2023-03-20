@@ -1,12 +1,39 @@
+import fs from 'fs'
+import admin from 'firebase-admin'
 import express from 'express'
 import { db, ConnectDb } from './db.js'
 
 
+const credentials = JSON.parse(
+    fs.readFileSync('./credential.json')
+)
+admin.initializeApp({
+    credential: admin.credential.cert(credentials)
+})
+
 const app = express()
 app.use(express.json())
 
+app.use(async (req, res, next) =>{
+    const { authtoken } = req.headers
+
+    if (authtoken) {
+
+        try{
+            req.user = await admin.auth().verifyIdToken(authtoken)
+        }catch (e){
+            return res.sendStatus(400)
+        }
+    }
+
+    req.user = req.user || {}
+
+    next()
+})
+
 app.get('/api/articles/:name', async (req, res) =>{
     const { name} = req.params;
+    const { uid } = req.user
 
     // const client = new MongoClient('mongodb://127.0.0.1:27017')
     // await client.connect();
@@ -14,14 +41,25 @@ app.get('/api/articles/:name', async (req, res) =>{
 
     const article = await db.collection('articles').findOne({name})
     if (article){ 
+        const upvoteIds = article.upvoteIds || []
+        article.canUpvote = uid && !upvoteIds.includes(uid)
         res.json(article)
     }else{
         res.sendStatus(404)
     }
-} )
+})
+
+app.use((req, res, next) =>{
+    if(req.user){
+        next()
+    } else {
+        res.sendStatus(401)
+    }
+})
 
 app.put('/api/articles/:name/upvote', async(req, res) =>{
     const {name} = req.params;
+    const {uid} = req.user
 
     // const client = new MongoClient('mongodb://127.0.0.1:27017')
     // await client.connect();
@@ -29,12 +67,20 @@ app.put('/api/articles/:name/upvote', async(req, res) =>{
 
     // const article = articlesInfor.find(a => a.name ===name)
 
-    await db.collection('articles').updateOne({name}, {$inc:{upvotes: 1 },})
-
     const article = await db.collection('articles').findOne({name})
-    
-    if(article){
-        res.json(article)
+    if (article){ 
+        const upvoteIds = article.upvoteIds || []
+        const canUpvote = uid && !upvoteIds.includes(uid)
+
+        if(canUpvote){
+
+            await db.collection('articles').updateOne({name}, {$inc:{upvotes: 1 },
+            $push:{upvoteIds: uid}})
+        }
+
+        const updateArticle = await db.collection('articles').findOne({name})
+        res.json(updateArticle)
+
         // article.upvotes += 1
         // res.send(`The ${name} article now has ${article.upvotes} upvotes!! `)
     }else {
@@ -44,7 +90,8 @@ app.put('/api/articles/:name/upvote', async(req, res) =>{
 
 app.post('/api/articles/:name/comments', async (req, res) =>{
     const{name} = req.params
-    const {postedBy, text}= req.body
+    const{text}= req.body
+    const {email} = req.user
     
     // const article = articlesInfor.find(a => a.name ===name)
 
@@ -52,7 +99,9 @@ app.post('/api/articles/:name/comments', async (req, res) =>{
     // await client.connect();
     // const db = client.db('blogbackend_db')
 
-    await db.collection('articles').updateOne({name}, {$push:{comments :{postedBy, text}},})
+    await db.collection('articles').updateOne({name}, {
+        $push:{comments :{postedBy: email, text }},
+    })
 
     const article = await db.collection('articles').findOne({name})
     

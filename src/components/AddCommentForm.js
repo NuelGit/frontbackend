@@ -1,21 +1,25 @@
 import axios from 'axios'
 import React from 'react'
 import { useState } from 'react'
+import useUser from '../hooks/useUser'
 
 
 
 const AddCommentForm = ({articleName, onCommentUpdated }) => {
-    const [name, setName] = useState('')
+    // const [name, setName] = useState('')
     const [commentText, setCommentText] = useState('')
+    const {user} = useUser()
 
     const addComment = async () =>{
+        const token = user && await user.getIdToken()
+    const headers = token ? {authtoken: token}: {}
         const response = await axios.post(`/api/articles/${articleName}/comments`, {
-            postedBy:name,
+            // postedBy: name,
             text: commentText
-        })
+        }, {headers,})
         const updatedComments = response.data
         onCommentUpdated(updatedComments)
-        setName('')
+        // setName('')
         setCommentText('')
     }
 
@@ -23,20 +27,11 @@ const AddCommentForm = ({articleName, onCommentUpdated }) => {
     <div id='add-comment-form'> 
     <h3> Add a Comment </h3>
 
-    <label> 
-        Name: 
-        <input 
-            value={name}
-            onChange= {event =>setName(event.target.value) }
-        type= "text" />
-    </label>
+    {user &&<p> You are posting as {user.email} </p> }
 
-    <label>
-        Comments:
         <textarea rows='4' cols='50'
         value={commentText}
         onChange= {event =>setCommentText(event.target.value)} />
-    </label>
 
     <button onClick={addComment}>Add Comment</button>
     </div>
